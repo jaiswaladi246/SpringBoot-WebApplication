@@ -18,4 +18,4 @@ spec:
       - name: spring-boot-app
         image: adijaiswal/xyz:tag
         ports:
-        - containerPort: 8080
+        - containerPort: 8081
