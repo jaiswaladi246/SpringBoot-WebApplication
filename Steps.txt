@@ -1,0 +1,90 @@
+
+--- JDK & Maven Installation ---
+
+sudo apt-get update -y
+sudo apt install openjdk-11-jre -y
+sudo apt-get install maven -y
+
+--- Docker Installation ---
+
+sudo apt-get update -y
+sudo apt-get install docker.io -y
+service docker restart
+sudo usermod -aG docker $USER
+newgrp docker
+sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+
+--- KUBERNETES ---
+
+# Step1:
+
+#On Master and slave 
+
+apt-get update -y
+apt-get install docker.io -y
+service docker restart  
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -  
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt install kubeadm=1.20.0-00 kubectl=1.20.0-00 kubelet=1.20.0-00 -y  
+
+# Step2:
+
+#On Master node:
+
+   kubeadm init --pod-network-cidr=192.168.0.0/16
+  
+   
+   
+# Step3: 
+
+# On Master node: 
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
+   
+# step4:
+
+#On Master node:
+
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
+
+
+
+##################################################################################################################################################
+
+
+--- INSTALL JENKINS ---
+
+sudo apt install openjdk-11-jre
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update -y 
+sudo apt-get install jenkins -y
+
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
+
+
+---TRIVY INSTALLATION STEPS---
+
+sudo apt-get install wget apt-transport-https gnupg lsb-release
+
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+
+sudo apt-get update
+
+sudo apt-get install trivy -y
